@@ -1,0 +1,56 @@
+import { create } from 'zustand';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { useMarketStore } from './marketStore';
+import type { WsMessage } from './marketStore';
+
+const WS_URL = 'ws://localhost:8000/ws';
+
+interface WsStore {
+  connected: boolean;
+  socket: ReconnectingWebSocket | null;
+  connect: () => void;
+  disconnect: () => void;
+}
+
+export const useWsStore = create<WsStore>((set, get) => ({
+  connected: false,
+  socket: null,
+
+  connect: () => {
+    if (get().socket) return;
+
+    const ws = new ReconnectingWebSocket(WS_URL, [], {
+      reconnectInterval: 2000,
+      maxReconnectAttempts: Infinity,
+    });
+
+    ws.addEventListener('open', () => {
+      set({ connected: true });
+      // Heartbeat
+      const interval = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send('ping');
+        }
+      }, 20000);
+      ws.addEventListener('close', () => clearInterval(interval));
+    });
+
+    ws.addEventListener('close', () => set({ connected: false }));
+
+    ws.addEventListener('message', (event) => {
+      try {
+        const msg: WsMessage = JSON.parse(event.data as string);
+        useMarketStore.getState().handleWsMessage(msg);
+      } catch {
+        // ignore non-JSON (e.g. "pong")
+      }
+    });
+
+    set({ socket: ws });
+  },
+
+  disconnect: () => {
+    get().socket?.close();
+    set({ socket: null, connected: false });
+  },
+}));
