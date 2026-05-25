@@ -5,8 +5,7 @@
       "routePrefix": "/",
       "framework": "vite",
       "installCommand": "pnpm install",
-      "buildCommand": "pnpm run build",
-      "outputDirectory": "dist"
+      "buildCommand": "pnpm run build"
     },
     "backend": {
       "root": "backend",
