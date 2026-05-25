@@ -1,0 +1,27 @@
+NYSE Picker App
+
+Open CommandPrompt
+
+INITIAL Setup
+Backend:
+cd c:\Users\Home\source\ai-github\nyse-picker\backend
+.venv\Scripts\activate.bat
+pip install -r requirements.txt
+
+FrontEnd:
+cd c:\Users\Home\source\ai-github\nyse-picker\frontend
+pnpm install
+
+
+Start Commands
+
+Open 2 different command prompts
+
+FrontEND :
+cd c:\Users\Home\source\ai-github\nyse-picker\frontend
+pnpm dev
+
+BackEND:
+cd c:\Users\Home\source\ai-github\nyse-picker\backend
+.venv\Scripts\activate.bat
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload

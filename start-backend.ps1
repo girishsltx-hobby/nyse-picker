@@ -2,7 +2,7 @@
 # Requires Python 3.11 at C:\Users\WA0G74\AppData\Local\Programs\Python\Python311\python.exe
 # Adjust PYTHON path if yours differs
 
-$PYTHON = "C:\Users\WA0G74\AppData\Local\Programs\Python\Python311\python.exe"
+$PYTHON = "C:\Users\Home\AppData\Local\Programs\Python\Python313\python.exe"
 $BACKEND = "$PSScriptRoot\backend"
 
 # ---------------------------------------------------------------------------
