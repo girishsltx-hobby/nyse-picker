@@ -3,11 +3,16 @@
     "frontend": {
       "root": "frontend",
       "routePrefix": "/",
-      "framework": "vite"
+      "framework": "vite",
+      "installCommand": "pnpm install",
+      "buildCommand": "pnpm run build",
+      "outputDirectory": "dist"
     },
     "backend": {
       "root": "backend",
-      "routePrefix": "/_/backend"
+      "routePrefix": "/_/backend",
+      "installCommand": "pip install -r requirements.txt",
+      "startCommand": "uvicorn backend.main:app --host 0.0.0.0 --port 8000"
     }
   }
 }
