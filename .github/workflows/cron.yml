@@ -1,0 +1,16 @@
+name: Fetch Market Data
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # every 5 minutes
+  workflow_dispatch:          # manual trigger too
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger fetch cycle
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://nyse-picker-007.vercel.app/_/backend/api/cron/fetch-data
