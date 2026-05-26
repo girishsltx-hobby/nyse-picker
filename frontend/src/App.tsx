@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { useWebSocket } from './hooks/useWebSocket'
 import { useMarketStore } from './stores/marketStore'

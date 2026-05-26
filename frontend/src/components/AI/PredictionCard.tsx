@@ -7,7 +7,7 @@ interface PredictionCardProps {
   prediction: PredictionRow | null;
 }
 
-const PredictionCard: React.FC<PredictionCardProps> = ({ ticker, prediction }) => {
+const PredictionCard: React.FC<PredictionCardProps> = ({ /* ticker, */prediction }) => {
   if (!prediction) {
     return (
       <div className="prediction-card empty">

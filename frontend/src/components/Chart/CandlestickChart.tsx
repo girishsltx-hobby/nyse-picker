@@ -28,7 +28,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
   ticker,
   candles,
   indicators,
-  height = 420,
+  /*height = 420,*/
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);

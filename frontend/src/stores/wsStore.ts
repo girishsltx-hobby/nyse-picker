@@ -20,8 +20,8 @@ export const useWsStore = create<WsStore>((set, get) => ({
     if (get().socket) return;
 
     const ws = new ReconnectingWebSocket(WS_URL, [], {
-      reconnectInterval: 2000,
-      maxReconnectAttempts: Infinity,
+      connectionTimeout: 2000,        // ← replaces reconnectInterval
+      maxRetries: Infinity,           // ← replaces maxReconnectAttempts
     });
 
     ws.addEventListener('open', () => {
