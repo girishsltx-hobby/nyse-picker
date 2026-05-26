@@ -21,6 +21,8 @@ from api.routes_signals import router as signals_router
 from api.routes_predictions import router as predictions_router
 from api.routes_composite import router as composite_router
 from api.ws import router as ws_router
+from api.cron import router as cron_router          # ← ADD THIS
+
 
 
 @asynccontextmanager
@@ -51,6 +53,7 @@ app.include_router(signals_router, prefix="/api")
 app.include_router(predictions_router, prefix="/api")
 app.include_router(composite_router, prefix="/api")
 app.include_router(ws_router)
+app.include_router(cron_router)                     # ← ADD THIS
 
 
 @app.get("/api/health")

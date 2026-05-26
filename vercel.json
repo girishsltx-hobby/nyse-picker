@@ -13,5 +13,11 @@
       "framework": "python",
       "entrypoint": "main.py"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/_/backend/api/cron/fetch-data",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }
