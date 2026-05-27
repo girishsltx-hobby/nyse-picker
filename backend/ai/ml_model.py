@@ -41,8 +41,18 @@ _LABEL_REVERSE = {1: "UP", -1: "DOWN", 0: "NEUTRAL"}
 
 
 def _encode_evidence(ev: EvidenceFields) -> np.ndarray:
-    price = ev.price or 0.0
-    vwap = ev.vwap or price
+    def safe_float(val, default=0.0):
+        """Convert value to float, handle None and NaN."""
+        if val is None:
+            return default
+        try:
+            f = float(val)
+            return default if np.isnan(f) else f
+        except (TypeError, ValueError):
+            return default
+
+    price = safe_float(ev.price, 0.0)
+    vwap = safe_float(ev.vwap, price)
 
     ema_state_enc = 1 if ev.ema_state == "BULLISH" else (-1 if ev.ema_state == "BEARISH" else 0)
     price_vs_vwap_enc = 1 if ev.price_vs_vwap == "ABOVE" else -1 if ev.price_vs_vwap == "BELOW" else 0
@@ -55,23 +65,23 @@ def _encode_evidence(ev: EvidenceFields) -> np.ndarray:
     else:
         vwap_motion_enc = 0.0
 
-    poc = ev.poc or price
-    sup = ev.nearest_support or price
-    res = ev.nearest_resistance or price
+    poc = safe_float(ev.poc, price)
+    sup = safe_float(ev.nearest_support, price)
+    res = safe_float(ev.nearest_resistance, price)
 
     return np.array([
-        ev.ema9 or price,
-        ev.ema21 or price,
+        safe_float(ev.ema9, price),
+        safe_float(ev.ema21, price),
         ema_state_enc,
-        ev.vwap_distance_pct or 0.0,
+        safe_float(ev.vwap_distance_pct, 0.0),
         vwap_motion_enc,
         price_vs_vwap_enc,
         daily_trend_enc,
         price - poc,
         price - sup,
         res - price,
-        ev.recent_return_5m or 0.0,
-        ev.recent_volatility or 0.0,
+        safe_float(ev.recent_return_5m, 0.0),
+        safe_float(ev.recent_volatility, 0.0),
     ], dtype=float).reshape(1, -1)
 
 
@@ -113,12 +123,19 @@ class MLEvaluator:
             try:
                 ev_dict = json.loads(row["evidence"]) if isinstance(row["evidence"], str) else row["evidence"]
                 ev = EvidenceFields(**ev_dict)
-                X.append(_encode_evidence(ev).flatten())
+                X_row = _encode_evidence(ev).flatten()
+                # Skip rows with any remaining NaN values
+                if np.any(np.isnan(X_row)):
+                    logger.debug("Skipping training row with NaN values")
+                    continue
+                X.append(X_row)
                 y.append(_LABEL_MAP[outcome])
-            except Exception:
+            except Exception as exc:
+                logger.debug("Skipping training row: %s", exc)
                 continue
 
         if len(X) < ML_MIN_SAMPLES:
+            logger.info("Insufficient training samples after cleaning: %d (need %d)", len(X), ML_MIN_SAMPLES)
             return
 
         self._model = GradientBoostingClassifier(n_estimators=100, max_depth=3, random_state=42)
@@ -135,6 +152,8 @@ class MLEvaluator:
             return None
         try:
             X = _encode_evidence(evidence)
+            # Final safeguard: replace any remaining NaN with 0.0
+            X = np.nan_to_num(X, nan=0.0)
             label = int(self._model.predict(X)[0])
             proba = self._model.predict_proba(X)[0]
             confidence = float(max(proba))

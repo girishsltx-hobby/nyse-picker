@@ -41,7 +41,8 @@ app = FastAPI(title="Picker — NYSE Ticker Dashboard", version="1.0.0", lifespa
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:4173"],
+    allow_origins=["http://localhost:5173", "http://localhost:4173",
+        "https://nyse-picker-007.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

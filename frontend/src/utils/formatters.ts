@@ -1,7 +1,11 @@
 export const TICKERS = ['SPY', 'QQQ', 'SPX', 'AAPL', 'GOOGL', 'NVDA', 'TSLA', 'AMZN', 'MSFT', 'PLTR'] as const;
 export type Ticker = typeof TICKERS[number];
 
-export const API_BASE = 'http://localhost:8000/api';
+const isLocal = window.location.hostname === 'localhost';
+
+export const API_BASE = isLocal
+  ? 'http://localhost:8000/api'
+  : 'https://nyse-picker-007.vercel.app/api';
 
 export function formatPrice(p: number | null): string {
   if (p == null) return '—';

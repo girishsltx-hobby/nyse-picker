@@ -3,7 +3,11 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { useMarketStore } from './marketStore';
 import type { WsMessage } from './marketStore';
 
-const WS_URL = 'ws://localhost:8000/ws';
+const isLocal = window.location.hostname === 'localhost';
+
+const WS_URL = isLocal
+  ? 'ws://localhost:8000/ws'
+  : 'wss://nyse-picker-007.vercel.app/ws';
 
 interface WsStore {
   connected: boolean;

@@ -2,7 +2,7 @@ name: Fetch Market Data
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes
+    - cron: '* 8-5 * * *'   # every 1 minute between 8am and 5pm
   workflow_dispatch:          # manual trigger too
 
 jobs:
