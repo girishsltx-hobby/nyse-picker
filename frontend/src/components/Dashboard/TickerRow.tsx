@@ -6,7 +6,7 @@ interface TickerRowProps {
   ticker: string;
   selected: boolean;
   onClick: () => void;
-  onRemove: () => void;
+  onRemove: () => Promise<void> | void;
 }
 
 const TickerRow: React.FC<TickerRowProps> = ({ ticker, selected, onClick, onRemove }) => {
@@ -24,6 +24,12 @@ const TickerRow: React.FC<TickerRowProps> = ({ ticker, selected, onClick, onRemo
   const aiColor = aiDir === 'UP' ? '#26a69a' : aiDir === 'DOWN' ? '#ef5350' : '#555';
   const aiLabel = aiDir && aiConf != null ? `${Math.round(aiConf * 100)}%` : '—';
 
+  const handleRemoveClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm(`Remove ${ticker} from watchlist?`)) {
+      await onRemove();
+    }
+  };
   return (
     <tr
       className={`ticker-row${selected ? ' selected' : ''}`}
@@ -36,7 +42,7 @@ const TickerRow: React.FC<TickerRowProps> = ({ ticker, selected, onClick, onRemo
         {ticker}
         {hovering && (
           <span
-            onClick={(e) => { e.stopPropagation(); onRemove(); }}
+            onClick={handleRemoveClick}
             title="Remove"
             style={{
               position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)',

@@ -16,7 +16,7 @@ $BACKEND = "$PSScriptRoot\backend"
 # ---------------------------------------------------------------------------
 
 $env:LLM_PROVIDER = "gemini"      # change to "gemini", "openai", "anthropic", or "ollama"
-$env:LLM_API_KEY  = "AIzaSyA8xjv3GSAN3iqnONCFTd3DJZYmRPcnzas"              # paste your API key here (leave blank for ollama/disabled)
+$env:LLM_API_KEY  = ""              # paste your API key here (leave blank for ollama/disabled)
 # $env:LLM_MODEL  = ""              # optional: override default model for the chosen provider
 # $env:OLLAMA_BASE_URL = "http://localhost:11434"  # only needed if Ollama runs on a different port
 

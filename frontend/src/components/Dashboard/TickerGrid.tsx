@@ -9,7 +9,7 @@ interface TickerGridProps {
   sortBy: 'ticker' | 'price' | 'ai' | null;
   onSortChange: (s: 'ticker' | 'price' | 'ai') => void;
   onAddTicker: (t: string) => Promise<string | null>;
-  onRemoveTicker: (t: string) => void;
+  onRemoveTicker: (t: string) => Promise<void> | void;
 }
 
 const TickerGrid: React.FC<TickerGridProps> = ({
@@ -45,6 +45,12 @@ const TickerGrid: React.FC<TickerGridProps> = ({
     const sym = inputVal.trim().toUpperCase();
     if (!sym) return;
     if (tickers.includes(sym)) { setInputVal(''); setAdding(false); return; }
+    
+    // Confirm before adding
+    if (!window.confirm(`Add ${sym} to watchlist?`)) {
+      return;
+    }
+    
     setAddLoading(true);
     setAddError(null);
     const err = await onAddTicker(sym);

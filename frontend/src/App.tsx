@@ -52,6 +52,10 @@ function App() {
     initTicker(t);
     setDisplayTickers((p) => [...p, t]);
     try {
+      // Add ticker to backend config
+      await axios.post(`${API_BASE}/tickers/add?ticker=${t}`);
+      
+      // Fetch data for the new ticker
       const r = await axios.post(`${API_BASE}/ticker/${t}/refresh`);
       if (r.data.indicators) setIndicators(t, r.data.indicators as any);
       if (r.data.price != null) setPrice(t, r.data.price, (r.data.session ?? 'closed') as any);
@@ -63,7 +67,12 @@ function App() {
       return (e?.response?.data?.detail as string) ?? `Could not find ticker "${t}"`;
     }
   };
-  const handleRemoveTicker = (t: string) => {
+  const handleRemoveTicker = async (t: string) => {
+    try {
+      await axios.post(`${API_BASE}/tickers/remove?ticker=${t}`);
+    } catch (e: any) {
+      console.error("Failed to remove ticker from config:", e);
+    }
     setDisplayTickers((p) => p.filter((x) => x !== t));
     if (selectedTicker === t) setSelectedTicker(null);
   };

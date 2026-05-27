@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from config import TICKERS, FETCH_INTERVAL_SECONDS, OHLCV_FETCH_LIMIT, ALERT_DEDUP_SECS
+from config import FETCH_INTERVAL_SECONDS, OHLCV_FETCH_LIMIT, ALERT_DEDUP_SECS
 from mcp_client import tv_mcp
 from indicators.ema import compute_crossover
 from indicators.vwap import compute_vwap
@@ -68,6 +68,8 @@ async def _loop() -> None:
 
 async def _run_cycle() -> None:
     global _session_date, _session_fired
+    from config import TICKERS  # Import here to get updated config
+    
     logger.info("--- Fetch cycle start ---")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")

@@ -87,11 +87,15 @@ async def refresh_ticker(ticker: str):
     """Fetch live data for any ticker on-demand (used when user adds a new ticker)."""
     from scheduler import process_ticker_once
     ticker = ticker.upper()
+    logger.info(f"Refresh requested for ticker: {ticker}")
+    
     try:
         await process_ticker_once(ticker)
+        logger.info(f"Data fetch completed for {ticker}")
     except Exception as exc:
-        logger.error("refresh_ticker [%s] failed: %s", ticker, exc, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(exc))
+        logger.error(f"refresh_ticker [{ticker}] fetch failed: {exc}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch data for {ticker}: {str(exc)[:200]}")
+    
     conn = await db.get_db()
     try:
         ind_rows = await conn.execute_fetchall(
@@ -108,9 +112,13 @@ async def refresh_ticker(ticker: str):
         )
     finally:
         await conn.close()
-    # If no candle data was stored, yfinance returned nothing — ticker is invalid
+    
+    # If no candle data was stored, the fetch didn't return data
     if not candle_rows:
-        raise HTTPException(status_code=404, detail=f"Ticker '{ticker}' not found or returned no data")
+        logger.warning(f"No candle data found for {ticker} after fetch attempt")
+        raise HTTPException(status_code=404, detail=f"No data available for ticker '{ticker}'. It may not be a valid NYSE ticker or data fetch failed.")
+    
+    logger.info(f"Successfully refreshed {ticker}: price={float(candle_rows[0]['close'])}")
     return {
         "ticker": ticker,
         "indicators": dict(ind_rows[0]) if ind_rows else None,
